@@ -34,6 +34,9 @@ class BST
 
       //removes a value from tree
       bool remove(int value);
+      
+      //removes a value from tree
+      bool remove(BST_Node* root, int value);
 
       //returns the node if a value exists
       BST_Node* search(int value);
@@ -52,9 +55,13 @@ class BST
 
       //add node to numNode
       void numNodes();
-      
+
+      //remove node to numNode
+      void decreaseNumNodes();
+   
       //destructor
       virtual ~BST();
+   
    private:
       int numNodes;//holds number of nodes.
       BST_Node *root;// start of tree
@@ -64,6 +71,4 @@ class BST
 
       //clears the tree
       void makeEmpty(BST_Node *root);
-
-
 };// end BST 
