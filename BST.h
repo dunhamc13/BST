@@ -48,10 +48,10 @@ class BST
       void preorder(const BST_Node *nodePtr) const;
 
       //Traversal inorder
-      void preorder(const BST_Node *root) const;
+      void inorder(const BST_Node *root) const;
 
       //Traversal postorder
-      void preorder(const BST_Node *root) const;
+      void postorder(const BST_Node *root) const;
 
       //add node to numNode
       void increaseNumNodes();
