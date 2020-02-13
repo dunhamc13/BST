@@ -8,7 +8,7 @@ BST::BST_Node::BST_Node() : data(-1), left(nullptr), right(nullptr)
 }//end constructor for node
 
 //Constructor for tree
-BST::BST() : root(nullptr) {}
+BST::BST() : numNodes(0), root(nullptr) {}
 
 //copy constructor for tree
 BST::BST(const BST& aTree)
@@ -77,7 +77,7 @@ bool BST::insert(BST *node, int value)
 
    //value is less than go left
    else
-      node = isert(node->left, value);
+      node = inert(node->left, value);
    return false;
 }//end insert
 
@@ -88,21 +88,80 @@ bool BST::remove(int value)
    BST_Node* exists = search(value);
    if (exists == nullptr)
       return false;
+   
+   //recursive call to delete
+   else
+      return remove(root, value);
+}//end remove first iteration
+
+bool BST::remove(BST_Node *root, value)
+{
+   //see if value exists
+   BST_Node* exists = search(root, value);
+   if (exists == nullptr)
+      return false;
 
    //if node is leaf return memory
    else if (exists->left == nullptr && exists->right == nullptr)
+   {
       delete exists;
+      decreaseNumNodes();
+      return true;
+   }
    
    //if one child
    else if (exists->left != nullptr && exists->right == nullptr)
-   {}
+   {
+      //make a temp node with single child
+      BST_Node *tmp = exists->left;
+      
+      //return memory
+      delete exists;
+      
+      //fix broken link in tree
+      exists = tmp;
+      decreaseNumNodes();
+      return true;
+   }//end remove one child on left
    
    else if (exists->left != nullptr && exists->right == nullptr)
-   {}
+   {
+      //make a temp node with single child
+      BST_Node *tmp = exists->right;
+      
+      //return memory
+      delete exists;
+      
+      //fix broken link in tree
+      exists = tmp;
+      decreaseNumNodes();
+      return true;
+   }// end one child on right
+   
    //if two children
    else
-   {}
+   {
+      //get successor node
+      BST_Node *successor = successor(exists->right);
+      
+      //copy data
+      exists->data = successor->data;
+      
+      //recursive call to delete successor node
+      return remove(exists->right, value);
+   }//end if two children
+   return false;
 }//end remove
+
+//returns successor node
+BST_Node* BST::successor(BST_Node *nodeToDeletesRighChild)
+{
+   BST_Node *currPtr = nodeToDeletesRightChild;
+   
+   while (currPtr != nullptr && currPtr->left != nullptr)
+      currPtr = currPtr->left;
+   return currPtr;
+}                                  
 
 //Searches a tree for a value and returns it
 BST_Node* BST::search(int value)
@@ -210,6 +269,12 @@ void BST::makeEmpty(const BST_Node *root) const
 void BST::numNodes()
 {
    numNode += 1;
+}//end numNodes
+
+//remove a node count to numNodes
+void BST::decreaseNumNodes()
+{
+   numNode -= 1;
 }//end numNodes
 
 //destructor
