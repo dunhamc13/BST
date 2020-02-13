@@ -3,12 +3,10 @@ using namespace std;
 
 //BST_Node Constructor
 BST::BST_Node::BST_Node() : data(-1), left(nullptr), right(nullptr)
-{
-   numNodes();
-}//end constructor for node
+{}//end constructor for node
 
 //Constructor for tree
-BST::BST() : numNodes(0), root(nullptr) {}
+BST::BST() : numNodes(0), root(nullptr) {}//end constructor for tree
 
 //copy constructor for tree
 BST::BST(const BST& aTree)
@@ -45,6 +43,7 @@ BST_Node* BST::copyTree(BST_Node *oldTreePtr)
       nodePtr->data = oldTreePtr->data;
       nodePtr->left = copyTree(oldTreePtr->left);
       nodePTr->right = copyTree(oldTreePtr->right);
+      increaseNumNodes();
    }
    return nodePtr;
    
@@ -67,6 +66,7 @@ bool BST::insert(BST *node, int value)
       //create new node and add data member
       node = new BST_Node();
       node->data = value;
+      increaseNumNodes();
       return true;
       
    }//end create new node
@@ -249,6 +249,35 @@ void BST::postorder(const BST_Node *root) const
    cout << "tree has " << numNodes << endl;
 }//end preorder
 
+//get height
+int BST::getHeight()
+{
+   getHeight(root);
+}//end getHeight
+
+//helper to get height
+int BST::getHeight(BST_Node *nodePtr) const
+{
+   //if node is emtpy
+   if (nodePtr == nullptr)
+      return 0;
+   
+   //recursive call to get height
+   return 1 + max(getHeight(nodePtr->left),getHeight(nodePtr->right));
+}//end getHeight
+
+//add a node count to numNodes
+void BST::increaseNumNodes()
+{
+   numNode += 1;
+}//end numNodes
+
+//remove a node count to numNodes
+void BST::decreaseNumNodes()
+{
+   numNode -= 1;
+}//end numNodes
+
 //Traversal postorder to delete
 void BST::makeEmpty(const BST_Node *root) const
 {
@@ -264,18 +293,6 @@ void BST::makeEmpty(const BST_Node *root) const
       delete root;
    }//end if not empty
 }//end postorder
-
-//add a node count to numNodes
-void BST::numNodes()
-{
-   numNode += 1;
-}//end numNodes
-
-//remove a node count to numNodes
-void BST::decreaseNumNodes()
-{
-   numNode -= 1;
-}//end numNodes
 
 //destructor
 BST::~BST()
