@@ -52,6 +52,13 @@ BST_Node* BST::copyTree(BST_Node *oldTreePtr)
 //insert into tree
 bool BST::insert(int value)
 {
+   //check if value exists already
+   BST_Node* exists = search(root, value);
+   if (exists == nullptr)
+   {
+      cout << "Value: " << value << " already exists." << endl;
+      return false;
+   }//end if exists
    //call helper
    return insert(root, value);
       
