@@ -59,6 +59,9 @@ class BST
       //remove node to numNode
       void decreaseNumNodes();
    
+      //get height of tree
+      int getHeight();
+   
       //destructor
       virtual ~BST();
    
@@ -68,6 +71,9 @@ class BST
 
       //copies tree
       BST_Node* copyTree(const BST_Node *oldTreePtr);
+      
+      //get height of tree
+      int getHeight(BST_Node* nodePtr) const;
 
       //clears the tree
       void makeEmpty(BST_Node *root);
