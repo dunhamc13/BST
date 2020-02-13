@@ -54,7 +54,7 @@ class BST
       void preorder(const BST_Node *root) const;
 
       //add node to numNode
-      void numNodes();
+      void increaseNumNodes();
 
       //remove node to numNode
       void decreaseNumNodes();
