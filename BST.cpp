@@ -22,13 +22,20 @@
 #include <iostream>  //for standard in out streams
 using namespace std;
 
-/*Constructor for tree
-*/
+/** DefaultConstructor BstNode
+  *  @Description: Creates an empty tree
+  *  @Pre: None
+  *  @Post: Bst root is null and number of nodes is 0.
+ */
 Bst::Bst() : numNodes(0), root(nullptr) 
 {}//end constructor for tree
 
-/*copy constructor for tree
-*/
+/**  Copy Constructor BstNode
+  *  @Description: Uses private helper, copyTree to 
+  *  create a dynamic deep copy of tree on the right.
+  *  @Pre: None
+  *  @Post: LHS is deep copy of RHS.
+ */
 Bst::Bst(const Bst& aTree)
 {
    BstNode *rootPtr = aTree.root;
