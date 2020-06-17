@@ -1,63 +1,182 @@
-#include <string>
-#pragma once
+/* Notes About File
+ * @File: Bst.h
+ * @Name: Christian Dunham
+ * @Date: 19Feb2020
+ * @Program Name:  Not Applicable - Code for Reuse
+ *
+ * Program Purpose: NA
+ *
+ *   Class Purpose:
+ *    This class creates a Binary Search Tree.  Each node stores a pointer to a data obj.
+ *    This allows the linked list to be used with other classes later on, as
+ *    long as that Bst has </>, <</>> operators. 
+ *
+ * Bst Private Members:
+ *    root holds the firstnode of the tree.
+ *
+ * Dynamic Memory:
+ *    The BstNodes are Dynmaically created. 
+ *
+ *******************************************************************************
+ *
+ *  Discussion of members:  -> (denotes helper member)
+ *
+ ***  Bst Class  *************************************************************
+ *
+ *    Constructors: -> Overloaded Constructor, Copy Constructor, Assighment
+ *    Operator :: -> copyBst -> clearBst
+ *    
+ *    The copy constructor and assigment operator both utilize a private
+ *    member copyBst.
+ *
+ *    Destructor: -> clearBst
+ *    The virtual destructor uses a private member clearGraph. 
+ *
+ *******************************************************************************
+ *
+ *                        Special Cases Identified
+ *
+ *******************************************************************************
+ *
+ ***  Bst Class  *************************************************************
+ *     : ???? :
+ *                a) ??????
+ *
+ *******************************************************************************
+ *
+ *******************************************************************************
+ *Product BackLog :
+ *                 1) ???????
+ *******************************************************************************
+ *
+ *******************************************************************************
+ * Code Outline :
+ *
+ *                Bst Definitions       :
+ *                              : public :
+ *                                         Constructor
+ *                                         Overloaded Constructor
+ *                                         Copy Constructor
+ *                                         Assignment Operator
+ *                                         insert
+ *                                         remove
+ *                                         deleteRoot
+ *                                         exists
+ *                                         sucessor
+ *                                         traversals
+ *                                         getNumNodes / add / decrement
+ *                                         getHeight
+ *                                         getRoot
+ *                                         Friend Operator<<
+ *                                         Friend Operator>>
+ *                                         ~Destructor
+ *                             : private :
+ *                                         copyBst
+ *                                         clearBst
+ *                                         helper functions
+ *
+ *
+ *
+ ******************************************************************************* 
+ *
+ *                        Included Libraries
+ *
+ *******************************************************************************
+ *******************************************************************************
+*/
+//#include "Comparable.h"   //ensure class is implemented - allows modularity
+#include <string>           //for strings
+#include <algorithm>        //for math function
+#pragma once                //protect compiling
 
-class BST
+class Bst
 {
-   public:
-      //struct BST_Node;
-      //friend struct BST_Node;
-      
-      //The Nodes for the tree
-      struct BST_Node
+   private:
+      struct BstNode
       {
-         int data;//data
-         struct BST_Node* left;//left child
-         struct BST_Node* right;//right child
+         /**
+          *  DefaultConstructor BstNode
+          *  @pre None
+          *  @post BstNode has Comparable key and left/right set to nullptr.
+          */
+         BstNode() : data(nullptr),left(nullptr), right(nullptr) {};
 
-         //default constructor
-         BST_Node();
-      };//
+         /**
+          *  Overload Constructor BstNode
+          *  @pre None
+          *  @post BstNode has Comparable key and left/right set to nullptr.
+          */
+         BstNode(Comparable* datum) : data(datum), left(nullptr), right(nullptr) {};
 
-      //BST Tree members
+         // Comparable object
+         Comparable* data = nullptr;
 
+         //Left subtree
+         BstNode* left = nullptr;
+
+         //Right subtree
+         BstNode* right = nullptr;
+      };
+
+      int numNodes;//holds number of nodes.
+      BstNode *root;// start of tree
+      
+      //copies tree
+      BstNode* copyTree(const BstNode *oldTreePtr);
+      
+      //Traversal preorder
+      void preorder(BstNode* nodePtr) const;
+
+      //Traversal inorder
+      void inorder(BstNode* nodePtr) const;
+
+      //Traversal postorder
+      void postorder(BstNode* nodePtr) const;
+      
+      //get height of tree
+      int getHeight(BstNode* nodePtr) const;
+
+      //clears the tree
+      void makeEmpty(BstNode*& rootPtr);
+   public:
       //Default constructor
-      BST();
+      Bst();
 
       //Copy constructor
-      BST(const BST& aTree);
+      Bst(const Bst& aTree);
 
       //assignment operator
-      BST& operator=(const BST& aTree);
+      Bst& operator=(const Bst& aTree);
 
       //insert a value
-      bool insert(int value);
+      bool insert(Comparable* datum);
       
       //insert helper
-      bool insert(BST_Node *node, int value);
+      bool insert(BstNode *root, Comparable* datum);
 
       //removes a value from tree
-      bool remove(int value);
+      bool remove(Comparable* datum);
       
       //removes a value from tree
-      bool remove(BST_Node *&root, int value);
+      bool remove(BstNode *&root, Comparable* datum);
 
       //removes a value from tree
-      void deleteRoot(BST_Node *&root);
+      void deleteRoot(BstNode *&root);
 
       //removes a value from tree
-      bool exists(int value);
+      bool exists(Comparable* datum);
       
       //removes a value from tree
-      bool exists(BST_Node* root, int value);
+      bool exists(BstNode* root, Comparable* datum);
 
       //removes a value from tree
-      int successor(BST_Node *&root);
+      Comparable* successor(BstNode *&root);
       
       //returns the node if a value exists
-      BST_Node* search(int value);
+      Comparable* search(Comparable* datum);
 
       //helps search for nodes with value
-      BST_Node* search(BST_Node *nodePtr, int value);
+      Comparable* search(BstNode *nodePtr, Comparable* datum);
       
       //Traversal preorder
       void preorder() const;
@@ -75,33 +194,17 @@ class BST
       void decreaseNumNodes();
    
       //get root of tree
-      BST_Node* getRoot() const;
+      BstNode* getRoot() const;
       
       //get height of tree
       int getHeight();
+      
+      //get number of nodes
+      int getNumNodes() const;
    
       //destructor
-      virtual ~BST();
+      virtual ~Bst();
+
+      friend class Store;
    
-   private:
-      int numNodes;//holds number of nodes.
-      BST_Node *root;// start of tree
-
-      //copies tree
-      BST_Node* copyTree(const BST_Node *oldTreePtr);
-      
-      //Traversal preorder
-      void preorder(BST_Node* nodePtr) const;
-
-      //Traversal inorder
-      void inorder(BST_Node* nodePtr) const;
-
-      //Traversal postorder
-      void postorder(BST_Node* nodePtr) const;
-      
-      //get height of tree
-      int getHeight(BST_Node* nodePtr) const;
-
-      //clears the tree
-      void makeEmpty(BST_Node* rootPtr);
-};// end BST 
+};// end Bst 
