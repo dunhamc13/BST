@@ -1,23 +1,43 @@
-#include <iostream>
-#include "BST.h"
+/* Notes About File
+ * @File: Bst.cpp
+ * @Name: Christian Dunham
+ * @Date: 19Feb2020
+ * @Program Name:  Not Applicable - Class for Reuse
+ *
+ * Program Purpose:
+ *    This purpose of this program is to build a robust Binary Search Tree Class
+ *    for reuse.  This class depends on a comparable class to be implemented as 
+ *    the data structure held in the tree.
+ *******************************************************************************
+ * Product Back Log :
+ *                  : Flush out comments
+ *******************************************************************************
+ *
+ *                        Included Libraries
+ *
+ *******************************************************************************
+ *******************************************************************************
+*/
+#include "Bst.h"     //Declarations for the class
+#include <iostream>  //for standard in out streams
 using namespace std;
 
-//BST_Node Constructor
-BST::BST_Node::BST_Node() : data(-1), left(nullptr), right(nullptr)
-{}//end constructor for node
+/*Constructor for tree
+*/
+Bst::Bst() : numNodes(0), root(nullptr) 
+{}//end constructor for tree
 
-//Constructor for tree
-BST::BST() : numNodes(0), root(nullptr) {}//end constructor for tree
-
-//copy constructor for tree
-BST::BST(const BST& aTree)
+/*copy constructor for tree
+*/
+Bst::Bst(const Bst& aTree)
 {
-   BST_Node *rootPtr = aTree.root;
+   BstNode *rootPtr = aTree.root;
    root = copyTree(rootPtr);
 }//end copy constructor
 
-//assignment operator
-BST& BST::operator=(const BST& aTree)
+/*assignment operator
+*/
+Bst& Bst::operator=(const Bst& aTree)
 {
    //make sure not the same
    if (this != &aTree)
@@ -27,23 +47,24 @@ BST& BST::operator=(const BST& aTree)
          makeEmpty(root);
       
       //then copy
-      BST_Node *rootPtr = aTree.root;
+      BstNode *rootPtr = aTree.root;
       root = copyTree(rootPtr);
    }//end if not the same
    return *this;
 }//end copy constructor
 
-//copies a tree recursively
-BST::BST_Node* BST::copyTree(const BST_Node *oldTreePtr)
+/*copies a tree recursively
+*/
+Bst::BstNode* Bst::copyTree(const BstNode *oldTreePtr)
 {
-   BST_Node *nodePtr;
+   BstNode *nodePtr;
    //special case
    if (oldTreePtr == nullptr)
       return nullptr;
    else
    {
-      nodePtr = new BST_Node();
-      nodePtr->data = oldTreePtr->data;
+      nodePtr = new BstNode();
+      nodePtr->data = oldTreePtr->data;//////////////////fix this for inheritance issues
       nodePtr->left = copyTree(oldTreePtr->left);
       nodePtr->right = copyTree(oldTreePtr->right);
       increaseNumNodes();
@@ -52,15 +73,17 @@ BST::BST_Node* BST::copyTree(const BST_Node *oldTreePtr)
    
 }//end copyTree
 
-//insert into tree
-bool BST::insert(int value)
+/*insert into tree
+*/
+bool Bst::insert(Comparable* datum)
 {
    //if root is null insert here
    if (root == nullptr)
    {
+      //cout << "insert at root " << datum << endl;
       //create new node and add data member
-      BST::BST_Node *node = new BST::BST_Node();
-      node->data = value;
+      BstNode *node = new BstNode();
+      node->data = datum;
       node->right = nullptr;
       node->left = nullptr;
       root = node;
@@ -69,87 +92,110 @@ bool BST::insert(int value)
    }//end create new node
 
    else
-      return insert(root, value);
+      return insert(root, datum);
 }//end insert
 
-//insert into tree
-bool BST::insert(BST::BST_Node *node, int value)
+/*insert into tree
+*/
+bool Bst::insert(BstNode *root, Comparable* datum)
 {
+   //cout << "inserting root, node " << datum << endl;
+   
    //value is greater go right
-   if (node->data < value)
+   if (*root->data < *datum)
    {
+      //cout << "going right " << datum << endl;
       //is not empty on right keep going
-      if (node->right != nullptr)
-         return insert(node->right, value);
+      if (root->right != nullptr)
+         return insert(root->right, datum);
 
       else 
       {
-         cout << "insert right " << value << endl;
+         //cout << "insert right "  << datum << endl;
          //create new node on right and add data member
-         node->right = new BST::BST_Node();
-         node->right->data = value;
-         node->right->right = nullptr;
-         node->right->left = nullptr;
+         root->right = new BstNode();
+         root->right->data = datum;
+         root->right->right = nullptr;
+         root->right->left = nullptr;
          increaseNumNodes();
          return true;
       }//end if exists
    }//end if greater go right
    
-   //value is less than go left
-   if (node->data > value)
+   /*value is less than go left
+   */
+   if (*root->data > *datum)
    { 
+      //cout << "going left " << datum << endl;
       //is not empty on the left keep going
-      if (node->left != nullptr)
+      if (root->left != nullptr)
       {
-         return insert(node->left, value);
+         return insert(root->left, datum);
       }//end keep going left
 
-      cout << "insert left " << value << endl;
+      //cout << "insert left "  << datum << endl;
       //create new node and add data member
-      node->left = new BST::BST_Node();
-      node->left->data = value;
-      node->left->right = nullptr;
-      node->left->left = nullptr;
+      root->left = new BstNode();
+      root->left->data = datum;
+      root->left->right = nullptr;
+      root->left->left = nullptr;
       increaseNumNodes();
       return true;
    }//end go left
    return false;
 }//end insert
 
-//Remove a value from a tree
-bool BST::remove(int value)
+/*Remove a value from a tree
+*/
+bool Bst::remove(Comparable* datum)
 {
-   return remove(*&root, value);
+   return remove(*&root, datum);
 }//end remove first iteration
 
-//Remove a value from a tree
-bool BST::remove(BST::BST_Node *&root, int value)
+/*Remove a value from a tree
+*/
+bool Bst::remove(BstNode *&root, Comparable* datum)
 {
    if (root == nullptr)
    {
       return false;
    }
    
-   else if (root->data == value)
+   else if (*root->data == *datum)
    {
-      deleteRoot(*&root);
-      return true;
+      int curr = root->data->getQty();
+      if (curr > 1)
+      {
+         curr = curr -1;
+         root->data->setQty(curr);
+         //
+         //cout <<"testing setting curr qty " << root->data->getQty() << endl;
+        return true; 
+      }//end if
+      else
+      {
+         deleteRoot(*&root);
+         return true;
+      }
    }
 
    //recursive call to delete
-   else if (value < root->data)
-      return remove(root->left, value);
+   else if (*datum < *root->data)
+      return remove(root->left, datum);
 
    else 
-      return remove(root->right, value);
+      return remove(root->right, datum);
 }//end remove first iteration
 
-void BST::deleteRoot(BST::BST_Node *&root)
+/*deletes node
+*/
+void Bst::deleteRoot(BstNode *&root)
 {
    //if node is leaf return memory
    if (root->left == nullptr && root->right == nullptr)
    {
-      cout << "leaf remove " << root->data << endl;
+      //cout << "leaf remove " << root->data << endl;
+      delete root->data;
       delete root;
       root = nullptr;
       decreaseNumNodes();
@@ -158,9 +204,10 @@ void BST::deleteRoot(BST::BST_Node *&root)
    //if one child
    else if (root->left == nullptr || root->right == nullptr)
    {
-      BST::BST_Node *tmp = root;
+      BstNode *tmp = root;
       root = root->left == nullptr ? root->right : root->left;
       //return memory
+      delete tmp->data;
       delete tmp;
       decreaseNumNodes();
    }//end remove one child on left
@@ -172,14 +219,16 @@ void BST::deleteRoot(BST::BST_Node *&root)
    }//end if two children
 }//end remove
 
-//returns successor node
-int BST::successor(BST::BST_Node* &root)
+/*returns successor node
+*/
+Comparable* Bst::successor(BstNode* &root)
 {
    if (root->left == nullptr)
    {
-      int item = root->data;
-      BST::BST_Node* junk = root;
+      Comparable* item = root->data;
+      BstNode* junk = root;
       root = root->right;
+      delete junk->data;
       delete junk;
       return item;
    }//end return item
@@ -187,20 +236,22 @@ int BST::successor(BST::BST_Node* &root)
       return successor(root->left);
 }                                  
 
-//Searches a tree for a value and returns it
-BST::BST_Node* BST::search(int value)
+/*Searches a tree for a value and returns it
+*/
+Comparable* Bst::search(Comparable* datum)
 {
    //special case head is null
    if (root != nullptr)
-      return search(root,value);
+      return search(root,datum);
 
    //use search helper
    else
       return nullptr;
 }//end search
 
-//Searches a tree for a value true if found
-bool BST::exists(int value)
+/*Searches a tree for a value true if found
+*/
+bool Bst::exists(Comparable* datum)
 {
    //special case head is null
    if (root == nullptr)
@@ -209,13 +260,14 @@ bool BST::exists(int value)
    //use search helper
    else
    {
-      BST_Node* rootPtr = BST::getRoot();
-      return exists(rootPtr, value);
+      BstNode* rootPtr = Bst::getRoot();
+      return exists(rootPtr, datum);
    }//end else
 }//end exists
 
-//Searches a tree for a value and returns it
-BST::BST_Node* BST::search(BST::BST_Node *nodePtr, int value)
+/*Searches a tree for a value and returns it
+*/
+Comparable* Bst::search(BstNode *nodePtr, Comparable* datum)
 {
    if (nodePtr == nullptr)
    {
@@ -223,71 +275,70 @@ BST::BST_Node* BST::search(BST::BST_Node *nodePtr, int value)
    }// end if nullptr
    
    //value found
-   else if (nodePtr->data == value)
+   else if (*nodePtr->data == *datum)
    {
-      return nodePtr;
+      return nodePtr->data;
    }//end target
    
    //if value greater go right
-   else if (value > nodePtr->data)
+   else if (*datum > *nodePtr->data)
    {
       if (nodePtr->right == nullptr)
          return nullptr;
       else
-         return search(nodePtr->right, value);
+         return search(nodePtr->right, datum);
    }// else go rigth
    
    //else it must be to the left
-   else if (value < nodePtr->data)
+   else if (*datum < *nodePtr->data)
    {
       if (nodePtr->left == nullptr)
          return nullptr;
       else
-         return search(nodePtr->left, value);
-   }//end go left
+         return search(nodePtr->left, datum);
+   }//end go leftw
 
    //all others
    return nullptr;
 }//end search
 
-//Searches a tree for a value and returns true if found
-bool BST::exists(BST::BST_Node *nodePtr, int value)
+/*Searches a tree for a value and returns true if found
+*/
+bool Bst::exists(BstNode *nodePtr, Comparable* datum)
 {
-   cout << nodePtr->data << endl;
-  cout << "exist helper" << endl; 
    //value found
    if (nodePtr == nullptr)
    {
-      cout << "false?" << endl;
       return false;
    }
    //value found
-   else if (nodePtr->data == value)
+   else if (*nodePtr->data == *datum)
       return true;
 
    //if value greater go right
-   else if (value > nodePtr->data)
+   else if (*datum > *nodePtr->data)
    {
       if (nodePtr->right == nullptr)
          return false;
       else
-         return exists(nodePtr->right, value);
+         return exists(nodePtr->right, datum);
    }//end else if go right
    
    //else it must be to the left
-   else if (value < nodePtr->data)
+   else if (*datum < *nodePtr->data)
    {
       if (nodePtr->left == nullptr)
          return false;
       else
-         return exists(nodePtr->left, value);
+         return exists(nodePtr->left, datum);
    }//end else if go left
    
    return false;
 }//end exists
 
-//Traversal preorder
-void BST::preorder(BST_Node *nodePtr) const
+/*Traversal preorder
+*/
+void Bst::preorder(BstNode *nodePtr) const
 {
    //special case not empty
   if (nodePtr != nullptr)
@@ -301,14 +352,16 @@ void BST::preorder(BST_Node *nodePtr) const
   }//end if not empty
 }//end preorder
 
-//Traversal preorder helper
-void BST::preorder() const
+/*Traversal preorder helper
+*/
+void Bst::preorder() const
 {
    preorder(root);
 }//end helper preorder
 
-//Traversal inorder
-void BST::inorder(BST_Node *nodePtr) const
+/*Traversal inorder
+*/
+void Bst::inorder(BstNode *nodePtr) const
 {
 
    //special case not empty
@@ -326,14 +379,16 @@ void BST::inorder(BST_Node *nodePtr) const
    }//end if not empty
 }//end preorder
 
-//Traversal inorder helper
-void BST::inorder() const
+/*Traversal inorder helper
+*/
+void Bst::inorder() const
 {
    inorder(root);
 }//end helper preorder
 
-//Traversal postorder
-void BST::postorder(BST_Node *nodePtr) const
+/*Traversal postorder
+*/
+void Bst::postorder(BstNode *nodePtr) const
 {
    //special case not empty
    if (nodePtr != nullptr)
@@ -348,21 +403,24 @@ void BST::postorder(BST_Node *nodePtr) const
    }//end if not empty
 }//end preorder
 
-//Traversal postorder helper
-void BST::postorder() const
+/*Traversal postorder helper
+*/
+void Bst::postorder() const
 {
    postorder(root);
 }//end helper preorder
 
-//get height
-int BST::getHeight()
+/*get height
+*/
+int Bst::getHeight()
 {
    int height = getHeight(root);
    return height;
 }//end getHeight
 
-//helper to get height
-int BST::getHeight(BST::BST_Node *nodePtr) const
+/*helper to get height
+*/
+int Bst::getHeight(BstNode *nodePtr) const
 {
    //if node is emtpy
    if (nodePtr == nullptr)
@@ -372,26 +430,37 @@ int BST::getHeight(BST::BST_Node *nodePtr) const
    return 1 + max(getHeight(nodePtr->left),getHeight(nodePtr->right));
 }//end getHeight
 
-//add a node count to numNodes
-void BST::increaseNumNodes()
+/*get numNodes
+*/
+int Bst::getNumNodes() const
+{
+   return numNodes;
+}//end getNumNodes
+
+/*add a node count to numNodes
+*/
+void Bst::increaseNumNodes()
 {
    numNodes += 1;
 }//end numNodes
 
-//remove a node count to numNodes
-void BST::decreaseNumNodes()
+/*remove a node count to numNodes
+*/
+void Bst::decreaseNumNodes()
 {
    numNodes -= 1;
 }//end numNodes
 
-//get root
-BST::BST_Node* BST::getRoot() const
+/*get root
+*/
+Bst::BstNode* Bst::getRoot() const
 {
    return root;
 }//end get root
 
-//Traversal postorder to delete
-void BST::makeEmpty(BST::BST_Node* rootPtr)
+/*Traversal postorder to delete
+*/
+void Bst::makeEmpty(BstNode*& rootPtr)
 {
    //special case not empty
    if (rootPtr != nullptr)
@@ -401,13 +470,16 @@ void BST::makeEmpty(BST::BST_Node* rootPtr)
       makeEmpty(rootPtr->right);
       
       //free memory
+      //cout << rootPtr->data << endl;
+      delete rootPtr->data;
       delete rootPtr;
       rootPtr = nullptr;
    }//end if not empty
 }//end postorder
 
-//destructor
-BST::~BST()
+/*destructor
+*/
+Bst::~Bst()
 {
    makeEmpty(root);
 }//end destructor
